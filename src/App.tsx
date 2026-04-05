@@ -10,6 +10,7 @@ import { LoginPage } from './pages/LoginPage'
 import { OverviewPage } from './pages/OverviewPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { TargetsPage } from './pages/TargetsPage'
+import { ERPIntegrationPage } from './pages/ERPIntegrationPage'
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="target" element={<TargetsPage />} />
           <Route path="pengungkapan" element={<DisclosurePage />} />
           <Route path="csrd" element={<CSRDPage />} />
+          <Route path="erp" element={<ERPIntegrationPage />} />
           <Route path="audit" element={<AuditLogPage />} />
           <Route path="pengaturan" element={<SettingsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />

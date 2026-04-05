@@ -10,6 +10,7 @@ const nav = {
     targets: 'Target & jalur reduksi',
     audit: 'Log aktivitas',
     settings: 'Pengaturan',
+    erp: 'Integrasi ERP',
   },
   en: {
     overview: 'Overview',
@@ -20,6 +21,7 @@ const nav = {
     targets: 'Targets & reduction pathway',
     audit: 'Activity log',
     settings: 'Settings',
+    erp: 'ERP Integration',
   },
 } as const
 

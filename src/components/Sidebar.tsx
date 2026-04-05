@@ -15,6 +15,7 @@ export function Sidebar() {
     { to: '/target', label: n.targets },
     { to: '/pengungkapan', label: n.disclosure },
     { to: '/csrd', label: n.csrd },
+    { to: '/erp', label: n.erp },
     { to: '/audit', label: n.audit },
     { to: '/pengaturan', label: n.settings },
   ]
