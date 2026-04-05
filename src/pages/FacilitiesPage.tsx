@@ -57,14 +57,17 @@ export function FacilitiesPage() {
   const chartData = useMemo(
     () =>
       facilities.map((f) => ({
-        name:
-          f.name.length > 14
-            ? `${f.name.slice(0, 12)}…`
-            : f.name,
+        name: f.name,
         intensitas: f.intensity,
-      })),
+        status: f.status
+      })).sort((a, b) => b.intensitas - a.intensitas),
     [facilities],
   )
+
+  const avgIntensity = useMemo(() => {
+    if (facilities.length === 0) return 0
+    return Math.round((facilities.reduce((a, b) => a + b.intensity, 0) / facilities.length) * 10) / 10
+  }, [facilities])
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -108,6 +111,26 @@ export function FacilitiesPage() {
           {subtitle}
         </p>
       </header>
+
+      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-xl border border-[var(--color-surface-border)] bg-[var(--color-surface-raised)] p-5">
+          <p className="text-xs font-medium uppercase tracking-wide text-[var(--color-muted)]">
+            {settings.locale === 'en' ? 'Avg. Intensity' : 'Rata-rata Intensitas'}
+          </p>
+          <p className="mt-2 text-2xl font-semibold text-[var(--color-fg)]">
+            {avgIntensity}
+            <span className="ml-2 text-xs font-normal text-[var(--color-muted)]">tCO₂e / unit</span>
+          </p>
+        </div>
+        <div className="rounded-xl border border-[var(--color-surface-border)] bg-[var(--color-surface-raised)] p-5">
+          <p className="text-xs font-medium uppercase tracking-wide text-[var(--color-muted)]">
+            {settings.locale === 'en' ? 'At Risk Sites' : 'Lokasi Berisiko'}
+          </p>
+          <p className="mt-2 text-2xl font-semibold text-rose-400">
+            {facilities.filter(f => f.status === 'risk').length}
+          </p>
+        </div>
+      </div>
 
       <section className="mb-8 rounded-xl border border-[var(--color-surface-border)] bg-[var(--color-surface-raised)] p-5 lg:p-6">
         <h3 className="text-sm font-semibold text-[var(--color-fg)]">

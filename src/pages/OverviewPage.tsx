@@ -18,33 +18,54 @@ function Stat({
   label,
   value,
   sub,
+  yoy,
 }: {
-  label: string;
-  value: string;
-  sub?: string;
+  label: string
+  value: string
+  sub?: string
+  yoy?: { text: string; color: string } | null
 }) {
   return (
     <div className="rounded-xl border border-[var(--color-surface-border)] bg-[var(--color-surface-raised)] p-5">
-      <p className="text-xs font-medium uppercase tracking-wide text-[var(--color-muted)]">
-        {label}
-      </p>
-      <p className="mt-2 text-2xl font-semibold tabular-nums tracking-tight text-[var(--color-fg)]">
-        {value}
-      </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wide text-[var(--color-muted)]">
+            {label}
+          </p>
+          <p className="mt-2 text-2xl font-semibold tabular-nums tracking-tight text-[var(--color-fg)]">
+            {value}
+          </p>
+        </div>
+        {yoy ? (
+          <span className={`text-[10px] font-bold ${yoy.color}`}>
+            {yoy.text}
+          </span>
+        ) : null}
+      </div>
       {sub ? (
         <p className="mt-1 text-xs text-[var(--color-muted)]">{sub}</p>
       ) : null}
     </div>
-  );
+  )
 }
 
 export function OverviewPage() {
-  const { state, scopeTotals, monthlySeries, disclosureWithProgress } =
+  const { state, scopeTotals, yoySummary, monthlySeries, disclosureWithProgress } =
     useDashboardState();
   const { settings, reductionTarget } = state;
   const loc = settings.locale === "en" ? "en-US" : "id-ID";
 
   const total = scopeTotals.scope1 + scopeTotals.scope2 + scopeTotals.scope3;
+
+  const yoyLabel = useMemo(() => {
+    if (yoySummary.percent === null) return null
+    const sign = yoySummary.percent > 0 ? '+' : ''
+    const color = yoySummary.percent > 0 ? 'text-rose-400' : 'text-emerald-400'
+    return {
+      text: `${sign}${yoySummary.percent}% vs ${settings.reportingYear - 1}`,
+      color
+    }
+  }, [yoySummary, settings.reportingYear])
 
   const avgDisclosure = useMemo(() => {
     if (disclosureWithProgress.length === 0) return 0;
@@ -143,6 +164,7 @@ export function OverviewPage() {
               ? "Scopes 1–3 (filtered)"
               : "Scope 1–3 (terfilter)"
           }
+          yoy={yoyLabel}
         />
         <Stat
           label="Scope 1"

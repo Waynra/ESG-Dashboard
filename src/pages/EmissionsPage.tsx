@@ -87,6 +87,14 @@ export function EmissionsPage() {
     })).filter((r) => r.value > 0)
   }, [scope3Map, settings.locale])
 
+  const qualitySummary = useMemo(() => {
+    const counts = { high: 0, medium: 0, estimated: 0 }
+    filteredLines.forEach(l => {
+      counts[l.dataQuality]++
+    })
+    return counts
+  }, [filteredLines])
+
   const onSubmit = (e: FormEvent) => {
     e.preventDefault()
     const n = Number(amount.replace(',', '.'))
@@ -143,6 +151,21 @@ export function EmissionsPage() {
             <p className="mt-3 text-xs text-[var(--color-muted)]">{c.hint}</p>
           </article>
         ))}
+      </div>
+
+      <div className="mb-8 grid gap-4 sm:grid-cols-3">
+        <div className="rounded-xl border border-[var(--color-surface-border)] bg-[var(--color-surface-raised)] p-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">High Quality</p>
+          <p className="mt-1 text-xl font-semibold text-[var(--color-fg)]">{qualitySummary.high} items</p>
+        </div>
+        <div className="rounded-xl border border-[var(--color-surface-border)] bg-[var(--color-surface-raised)] p-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-amber-400">Medium Quality</p>
+          <p className="mt-1 text-xl font-semibold text-[var(--color-fg)]">{qualitySummary.medium} items</p>
+        </div>
+        <div className="rounded-xl border border-[var(--color-surface-border)] bg-[var(--color-surface-raised)] p-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-rose-400">Estimated</p>
+          <p className="mt-1 text-xl font-semibold text-[var(--color-fg)]">{qualitySummary.estimated} items</p>
+        </div>
       </div>
 
       <section className="mb-8 rounded-xl border border-[var(--color-surface-border)] bg-[var(--color-surface-raised)] p-5 lg:p-6">

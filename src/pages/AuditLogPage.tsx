@@ -1,5 +1,18 @@
 import { useDashboardState } from '../context/DashboardStateContext'
 
+function ActionBadge({ action }: { action: string }) {
+  let color = 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+  if (action.includes('add')) color = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+  if (action.includes('delete')) color = 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+  if (action.includes('reset')) color = 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+
+  return (
+    <span className={`rounded border px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${color}`}>
+      {action}
+    </span>
+  )
+}
+
 export function AuditLogPage() {
   const { state } = useDashboardState()
   const { activityLog, settings } = state
@@ -46,11 +59,13 @@ export function AuditLogPage() {
             ) : (
               activityLog.map((row) => (
                 <tr key={row.id} className="hover:bg-white/[0.02]">
-                  <td className="whitespace-nowrap px-4 py-2 font-mono text-xs text-[var(--color-muted)]">
-                    {row.at}
+                  <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-[var(--color-muted)]">
+                    {row.at.replace('T', ' ').slice(0, 19)}
                   </td>
-                  <td className="px-4 py-2 text-[var(--color-accent)]">{row.action}</td>
-                  <td className="max-w-md truncate px-4 py-2 text-[var(--color-fg)]">
+                  <td className="px-4 py-3">
+                    <ActionBadge action={row.action} />
+                  </td>
+                  <td className="max-w-md truncate px-4 py-3 text-[var(--color-fg)]">
                     {row.detail}
                   </td>
                 </tr>

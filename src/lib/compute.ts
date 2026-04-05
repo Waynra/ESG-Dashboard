@@ -79,6 +79,16 @@ export function computeScopeTotals(lines: EmissionLine[]): ScopeTotals {
   )
 }
 
+export function computeYoY(
+  current: number,
+  previous: number,
+): { diff: number; percent: number | null } {
+  if (previous <= 0) return { diff: 0, percent: null }
+  const diff = current - previous
+  const percent = Math.round((diff / previous) * 100 * 10) / 10
+  return { diff, percent }
+}
+
 export function computeMonthlySeries(
   lines: EmissionLine[],
   reportingYear: number,

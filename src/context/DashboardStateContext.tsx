@@ -11,6 +11,7 @@ import {
   computeMonthlySeries,
   computeScopeTotals,
   computeFacilityDistribution,
+  computeYoY,
   disclosureProgressPercent,
   filterEmissionLines,
   scope3ByCategory,
@@ -172,6 +173,8 @@ type Ctx = {
   dispatch: React.Dispatch<Action>
   filteredLines: EmissionLine[]
   scopeTotals: ReturnType<typeof computeScopeTotals>
+  previousYearTotals: ReturnType<typeof computeScopeTotals>
+  yoySummary: ReturnType<typeof computeYoY>
   monthlySeries: ReturnType<typeof computeMonthlySeries>
   facilityDistribution: ReturnType<typeof computeFacilityDistribution>
   scope3Map: ReturnType<typeof scope3ByCategory>
@@ -209,6 +212,21 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
     () => computeScopeTotals(filteredLines),
     [filteredLines],
   )
+
+  const previousYearTotals = useMemo(() => {
+    const prevLines = filterEmissionLines(
+      state.emissionLines,
+      state.settings.reportingYear - 1,
+      state.settings.facilityFilter,
+    )
+    return computeScopeTotals(prevLines)
+  }, [state.emissionLines, state.settings.reportingYear, state.settings.facilityFilter])
+
+  const yoySummary = useMemo(() => {
+    const current = scopeTotals.scope1 + scopeTotals.scope2 + scopeTotals.scope3
+    const previous = previousYearTotals.scope1 + previousYearTotals.scope2 + previousYearTotals.scope3
+    return computeYoY(current, previous)
+  }, [scopeTotals, previousYearTotals])
 
   const monthlySeries = useMemo(
     () =>
@@ -256,6 +274,8 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
       dispatch,
       filteredLines,
       scopeTotals,
+      previousYearTotals,
+      yoySummary,
       monthlySeries,
       facilityDistribution,
       scope3Map,
@@ -266,6 +286,8 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
       state,
       filteredLines,
       scopeTotals,
+      previousYearTotals,
+      yoySummary,
       monthlySeries,
       facilityDistribution,
       scope3Map,
