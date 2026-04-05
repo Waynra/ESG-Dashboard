@@ -23,6 +23,18 @@ Data disimpan di **browser Anda** (localStorage) sehingga cocok untuk demo, pilo
 
 ---
 
+## Login
+
+- Tanpa backend: setelah membuka aplikasi Anda diarahkan ke **`/login`**.
+- **Default demo:** email `admin@esg-pulse.local` · sandi `esgpulse2026` (juga ditampilkan di halaman login).
+- **Ingat saya:** jika dicentang, sesi disimpan di `localStorage`; jika tidak, hanya di `sessionStorage` (hilang saat tab ditutup).
+- Kunci sesi: `esg-pulse-session-v1`. **Keluar** ada di bagian bawah sidebar.
+- Ubah kredensial lewat file **`.env`** (salin dari `.env.example`): `VITE_AUTH_EMAIL` dan `VITE_AUTH_PASSWORD`, lalu jalankan ulang `npm run dev`.
+
+Untuk produksi, ganti alur ini dengan **API login** (JWT, OAuth, SSO) dan jangan menyimpan sandi di klien.
+
+---
+
 ## Teknologi
 
 - **React 19** + **TypeScript**
@@ -73,8 +85,9 @@ Buka alamat yang muncul di terminal (biasanya `http://localhost:5173`).
 
 ```
 src/
-  components/     # Sidebar, TopBar, dll.
-  context/        # DashboardStateProvider — state global
+  components/     # Sidebar, TopBar, RequireAuth, dll.
+  config/         # Kredensial login demo (override .env)
+  context/        # AuthProvider, DashboardStateProvider
   data/           # Data awal (seed), referensi CSRD
   layouts/        # Layout dashboard
   lib/            # Agregasi emisi, CSV, pemeriksaan ESRS
