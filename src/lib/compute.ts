@@ -125,6 +125,26 @@ export function facilityNameById(facilities: Facility[]): Map<string, string> {
   return new Map(facilities.map((f) => [f.id, f.name]))
 }
 
+export function computeFacilityDistribution(
+  lines: EmissionLine[],
+  facilities: Facility[],
+  locale: 'id' | 'en',
+): { name: string; value: number }[] {
+  const map = new Map<string, number>()
+  const names = facilityNameById(facilities)
+  const orgLabel = locale === 'en' ? 'Organization-level' : 'Tingkat organisasi'
+
+  for (const l of lines) {
+    const fid = l.facilityId ?? 'org'
+    const name = fid === 'org' ? orgLabel : names.get(fid) ?? fid
+    map.set(name, (map.get(name) ?? 0) + l.amountTco2e)
+  }
+
+  return Array.from(map.entries())
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value)
+}
+
 export function disclosureProgressPercent(item: {
   tasks: { done: boolean }[]
 }): number {

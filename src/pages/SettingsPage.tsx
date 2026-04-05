@@ -3,7 +3,7 @@ import { useDashboardActions, useDashboardState } from '../context/DashboardStat
 import type { Locale, Scope2Accounting } from '../types/esg'
 
 export function SettingsPage() {
-  const { state } = useDashboardState()
+  const { state, dispatch } = useDashboardState()
   const { patchSettings, resetDemo } = useDashboardActions()
   const { settings } = state
 
@@ -15,6 +15,38 @@ export function SettingsPage() {
   const onOrgSubmit = (e: FormEvent) => {
     e.preventDefault()
     patchSettings({ organizationName: org.trim() || settings.organizationName })
+  }
+
+  const exportJson = () => {
+    const blob = new Blob([JSON.stringify(state, null, 2)], {
+      type: 'application/json',
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `esg-pulse-backup-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const importJson = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      try {
+        const parsed = JSON.parse(ev.target?.result as string)
+        if (!parsed.settings || !Array.isArray(parsed.emissionLines)) {
+          throw new Error('Invalid format')
+        }
+        dispatch({ type: 'hydrate', state: parsed })
+        alert(settings.locale === 'en' ? 'Data restored!' : 'Data berhasil dipulihkan!')
+      } catch (err) {
+        alert(settings.locale === 'en' ? 'Failed to restore: invalid JSON' : 'Gagal memulihkan: JSON tidak valid')
+      }
+    }
+    reader.readAsText(file)
+    e.target.value = ''
   }
 
   const title = settings.locale === 'en' ? 'Settings' : 'Pengaturan'
@@ -138,6 +170,35 @@ export function SettingsPage() {
               ? 'Used for reporting labels in exports and future period roll-ups.'
               : 'Digunakan untuk label ekspor dan agregasi periode mendatang.'}
           </p>
+        </section>
+
+        <section className="rounded-xl border border-[var(--color-surface-border)] bg-[var(--color-surface-raised)] p-5">
+          <h3 className="text-sm font-semibold text-[var(--color-fg)]">
+            {settings.locale === 'en' ? 'Backup & Restore' : 'Cadangan & Pemulihan'}
+          </h3>
+          <p className="mt-1 text-xs text-[var(--color-muted)]">
+            {settings.locale === 'en'
+              ? 'Save your data to a file or restore from a backup. This is useful for moving data between browsers.'
+              : 'Simpan data ke file atau pulihkan dari cadangan. Ini berguna untuk memindahkan data antar browser.'}
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button
+              type="button"
+              className="rounded-lg border border-[var(--color-surface-border)] px-4 py-2 text-sm font-medium text-[var(--color-fg)] hover:bg-white/5"
+              onClick={exportJson}
+            >
+              {settings.locale === 'en' ? 'Export JSON' : 'Ekspor JSON'}
+            </button>
+            <label className="relative flex cursor-pointer items-center rounded-lg bg-[var(--color-accent-dim)] px-4 py-2 text-sm font-medium text-[var(--color-accent)] hover:opacity-90">
+              {settings.locale === 'en' ? 'Import JSON' : 'Impor JSON'}
+              <input
+                type="file"
+                accept=".json"
+                className="absolute inset-0 cursor-pointer opacity-0"
+                onChange={importJson}
+              />
+            </label>
+          </div>
         </section>
 
         <section className="rounded-xl border border-rose-500/30 bg-rose-500/5 p-5">

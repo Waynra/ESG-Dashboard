@@ -58,6 +58,11 @@ export function TopBar() {
     setExportOpen(false)
   }
 
+  const printReport = () => {
+    window.print()
+    setExportOpen(false)
+  }
+
   const openExport = () => {
     if (closeTimer.current) clearTimeout(closeTimer.current)
     setExportOpen(true)
@@ -149,6 +154,14 @@ export function TopBar() {
                 onClick={exportDisclosure}
               >
                 {t.exportDisclosure}
+              </button>
+              <div className="my-1 border-t border-[var(--color-surface-border)]" />
+              <button
+                type="button"
+                className="block w-full px-3 py-2 text-left text-sm font-medium text-[var(--color-accent)] hover:bg-white/5"
+                onClick={printReport}
+              >
+                {settings.locale === 'en' ? 'Print summary report' : 'Cetak ringkasan laporan'}
               </button>
             </div>
           ) : null}

@@ -10,6 +10,7 @@ import {
 import {
   computeMonthlySeries,
   computeScopeTotals,
+  computeFacilityDistribution,
   disclosureProgressPercent,
   filterEmissionLines,
   scope3ByCategory,
@@ -172,6 +173,7 @@ type Ctx = {
   filteredLines: EmissionLine[]
   scopeTotals: ReturnType<typeof computeScopeTotals>
   monthlySeries: ReturnType<typeof computeMonthlySeries>
+  facilityDistribution: ReturnType<typeof computeFacilityDistribution>
   scope3Map: ReturnType<typeof scope3ByCategory>
   disclosureWithProgress: (DisclosureItem & { progress: number })[]
 }
@@ -224,6 +226,16 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
     ],
   )
 
+  const facilityDistribution = useMemo(
+    () =>
+      computeFacilityDistribution(
+        filteredLines,
+        state.facilities,
+        state.settings.locale,
+      ),
+    [filteredLines, state.facilities, state.settings.locale],
+  )
+
   const scope3Map = useMemo(
     () => scope3ByCategory(filteredLines),
     [filteredLines],
@@ -245,6 +257,7 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
       filteredLines,
       scopeTotals,
       monthlySeries,
+      facilityDistribution,
       scope3Map,
       disclosureWithProgress,
     }),
@@ -254,6 +267,7 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
       filteredLines,
       scopeTotals,
       monthlySeries,
+      facilityDistribution,
       scope3Map,
       disclosureWithProgress,
     ],

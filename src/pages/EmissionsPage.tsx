@@ -53,7 +53,7 @@ const scopeCards = {
 } as const
 
 export function EmissionsPage() {
-  const { state, filteredLines, scopeTotals, monthlySeries, scope3Map } =
+  const { state, filteredLines, scopeTotals, monthlySeries, scope3Map, facilityDistribution } =
     useDashboardState()
   const { addEmissionLine, deleteEmissionLine } = useDashboardActions()
   const { settings } = state
@@ -340,41 +340,74 @@ export function EmissionsPage() {
         <section className="rounded-xl border border-[var(--color-surface-border)] bg-[var(--color-surface-raised)] p-5 lg:p-6">
           <h3 className="text-sm font-semibold text-[var(--color-fg)]">
             {settings.locale === 'en'
-              ? 'Composition (tCO₂e)'
-              : 'Komposisi total (tCO₂e)'}
+              ? 'Scope distribution'
+              : 'Distribusi scope'}
           </h3>
-          <div className="mt-4 h-[280px]">
+          <div className="mt-6 h-[300px] w-full min-w-0">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={pieData}
-                  dataKey="value"
-                  nameKey="name"
+                  data={pieData.filter((d) => d.value > 0)}
                   cx="50%"
                   cy="50%"
-                  innerRadius={68}
-                  outerRadius={100}
-                  paddingAngle={2}
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
                 >
-                  {pieData.map((entry) => (
-                    <Cell key={entry.name} fill={entry.color} />
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(v) =>
-                    typeof v === 'number'
-                      ? `${v.toLocaleString(loc)} tCO₂e`
-                      : String(v)
-                  }
                   contentStyle={{
                     background: '#161a22',
                     border: '1px solid #252a35',
                     borderRadius: '8px',
                     fontSize: '12px',
                   }}
+                  itemStyle={{ color: '#e8eaef' }}
+                  formatter={(v: number) => [v.toLocaleString(loc), 'tCO₂e']}
                 />
-                <Legend wrapperStyle={{ fontSize: '12px' }} />
+                <Legend iconType="circle" />
               </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
+
+        <section className="rounded-xl border border-[var(--color-surface-border)] bg-[var(--color-surface-raised)] p-5 lg:p-6">
+          <h3 className="text-sm font-semibold text-[var(--color-fg)]">
+            {settings.locale === 'en'
+              ? 'Emissions by facility'
+              : 'Emisi per fasilitas'}
+          </h3>
+          <div className="mt-6 h-[300px] w-full min-w-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={facilityDistribution}
+                layout="vertical"
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#252a35" horizontal={true} vertical={false} />
+                <XAxis type="number" hide />
+                <YAxis
+                  dataKey="name"
+                  type="category"
+                  tick={{ fill: '#8b92a3', fontSize: 11 }}
+                  width={100}
+                />
+                <Tooltip
+                  cursor={{ fill: 'transparent' }}
+                  contentStyle={{
+                    background: '#161a22',
+                    border: '1px solid #252a35',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                  }}
+                  formatter={(v: number) => [v.toLocaleString(loc), 'tCO₂e']}
+                />
+                <Bar dataKey="value" fill="var(--color-accent)" radius={[0, 4, 4, 0]} barSize={20} />
+              </BarChart>
             </ResponsiveContainer>
           </div>
         </section>
