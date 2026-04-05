@@ -1,73 +1,125 @@
-# React + TypeScript + Vite
+# ESG Pulse Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplikasi web **konsol keberlanjutan (ESG)** untuk perusahaan: melacak emisi gas rumah kaca (Scope 1–3), KPI per fasilitas, kesiapan pelaporan, dan pemetaan ke arah praktik **GHG Protocol** serta **CSRD / ESRS** (lingkungan). Antarmuka gelap, cocok untuk gaya SaaS.
 
-Currently, two official plugins are available:
+Data disimpan di **browser Anda** (localStorage) sehingga cocok untuk demo, pilot internal, atau prototipe sebelum backend/API produksi.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## Isi aplikasi (ringkas)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Bagian | Fungsi |
+|--------|--------|
+| **Ringkasan** | Total emisi terfilter, grafik bulanan, cuplikan kesiapan pengungkapan dan progres vs garis dasar. |
+| **Emisi** | Inventaris per baris (tambah/hapus), grafik komposisi & batang, rincian Scope 3 per kategori GHG (1–15). |
+| **Fasilitas & KPI** | Daftar lokasi, energi/air/limbah/intensitas, tambah/hapus fasilitas. |
+| **Target & jalur reduksi** | Garis dasar, tahun target, persen reduksi; grafik perbandingan dengan total saat ini. |
+| **Kesiapan pengungkapan** | Workstream dengan **checklist tugas**; progres dan status dihitung dari tugas yang selesai. |
+| **Selaras CSRD** | Topik lingkungan ESRS (skor ilustratif) + **pemeriksaan readiness** otomatis + ekspor CSV. |
+| **Log aktivitas** | Riwayat perubahan data penting (sisi klien). |
+| **Pengaturan** | Nama organisasi, bahasa (ID/EN), Scope 2 lokasi vs pasar, awal tahun fiskal, reset data demo. |
 
-## Expanding the ESLint configuration
+**Bilah atas:** pilih **tahun pelaporan**, **filter fasilitas** (semua lokasi atau satu lokasi), dan menu **Ekspor** (CSV).
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Teknologi
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **React 19** + **TypeScript**
+- **Vite** (build & dev server)
+- **Tailwind CSS v4**
+- **React Router** (navigasi)
+- **Recharts** (grafik)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## Yang perlu dipasang
+
+- **Node.js** versi LTS (misalnya 20 atau 22) beserta **npm**
+
+---
+
+## Cara menjalankan
+
+Di folder proyek:
+
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Buka alamat yang muncul di terminal (biasanya `http://localhost:5173`).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Perintah lain
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Perintah | Keterangan |
+|----------|------------|
+| `npm run dev` | Mode pengembangan dengan hot reload |
+| `npm run build` | Build produksi ke folder `dist/` |
+| `npm run preview` | Menjalankan build produksi secara lokal |
+| `npm run lint` | Pemeriksaan ESLint |
+
+---
+
+## Data & penyimpanan
+
+- State aplikasi diserialisasi ke **localStorage** dengan kunci `esg-pulse-dashboard-v2`.
+- **Tidak ada server** bawaan: data hanya ada di browser yang sama (bisa hilang jika cache dibersihkan atau mode penyamaran).
+- Untuk lingkungan produksi, biasanya state ini diganti dengan **API** (REST/GraphQL) dan **autentikasi** (SSO, JWT, dll.).
+
+---
+
+## Struktur folder (utama)
+
 ```
+src/
+  components/     # Sidebar, TopBar, dll.
+  context/        # DashboardStateProvider — state global
+  data/           # Data awal (seed), referensi CSRD
+  layouts/        # Layout dashboard
+  lib/            # Agregasi emisi, CSV, pemeriksaan ESRS
+  pages/          # Satu file per halaman/rute
+  strings/        # Teks navigasi bilingual
+  types/          # Tipe TypeScript domain ESG
+```
+
+---
+
+## Standar & konsep yang dipakai
+
+- **GHG Protocol Corporate Standard:** pembagian Scope 1, 2, 3; Scope 3 mengacu pada **15 kategori** resmi.
+- **Scope 2:** di pengaturan bisa memilih penyampaian **basis lokasi** atau **basis pasar** (dokumentasi sertifikat/PPA tetap tanggung jawab proses pelaporan Anda).
+- **CSRD / ESRS:** modul “Selaras CSRD” memberi **pemetaan topik lingkungan** dan **daftar pemeriksaan** kelengkapan data; skor alignment bersifat **ilustratif** dan harus diganti dengan penilaian internal/assurance Anda.
+
+---
+
+## Ekspor berkas
+
+Dari menu **Ekspor** di bilah atas Anda bisa mengunduh CSV (UTF-8 dengan BOM agar Excel membaca huruf khusus dengan benar), antara lain:
+
+- Inventaris emisi  
+- Daftar fasilitas  
+- Ringkasan checklist pengungkapan  
+- Topik ESRS lingkungan  
+- Hasil pemeriksaan readiness  
+
+---
+
+## Mengembalikan data demo
+
+Di **Pengaturan → Zona bahaya → Setel ulang data demo**, semua data lokal diganti dengan dataset contoh lagi (nama organisasi dan bahasa yang dipilih bisa dipertahankan sesuai logika aplikasi).
+
+---
+
+## Lisensi & kontribusi
+
+Proyek ini bersifat privat (`private` di `package.json`). Sesuaikan bagian ini jika Anda membuka kode atau mempublikasikan paket.
+
+---
+
+## Tautan berguna
+
+- [Dokumentasi Vite](https://vite.dev/)
+- [Dokumentasi React](https://react.dev/)
+- [GHG Protocol](https://ghgprotocol.org/)
+- [EFRAG ESRS](https://www.efrag.org/esrs) (kerangka pelaporan terkait CSRD)
